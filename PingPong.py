@@ -1,5 +1,6 @@
 import turtle
 import winsound
+import time
 
 wn = turtle.Screen()
 wn.title("PingPong")
@@ -13,6 +14,8 @@ ticks_per_second = 60
 delay = int(1000 / ticks_per_second)
 tick_timer = 0
 tick_timer_clock = 0
+
+
 
 #paddle 1
 paddle_1 = turtle.Turtle()
@@ -70,13 +73,15 @@ timer.penup()
 timer.hideturtle()
 timer.goto(0, 220)
 
-
+xcor_old = ball.xcor()
+ycor_old = ball.ycor()
 
 def game_loop():
     wn.update()
     global score_1, score_2
     global tick_timer
     global tick_timer_clock
+    global xcor_old, ycor_old
     if tick_timer == 600:
         if ball.dy > 0:
             ball.dy = ball.dy + 0.5
@@ -93,7 +98,7 @@ def game_loop():
     tick_timer_clock += 1
     timer.clear()
     timer.write(f"Timer: {tick_timer_clock //60}", align="center", font=("Courier", 24, "normal"))
-    print(ball.dx, ball.dy)
+
     if "w" in pressed_keys and paddle_1.ycor() < 290:
         paddle_1.sety(paddle_1.ycor() + 20)
     if "s" in pressed_keys and paddle_1.ycor() > -290:
@@ -125,6 +130,9 @@ def game_loop():
         pen.clear()
         pen.write("Player 1: {} Player 2: {}".format(score_1, score_2), align="center", font=("Courier", 24, "normal"))
         winsound.PlaySound("bruh.wav", winsound.SND_ASYNC)
+        time.sleep(3)
+        
+
 
 
     if ball.xcor() < -390:
@@ -134,17 +142,40 @@ def game_loop():
         pen.clear()
         pen.write("Player 1: {} Player 2: {}".format(score_1, score_2), align="center", font=("Courier", 24, "normal"))
         winsound.PlaySound("bruh.wav", winsound.SND_ASYNC)
+        time.sleep(3)
 
     
-# paddle and ball collision
+
     collision_radius = 60
 
+    #math
+    xcor_old = (xcor_old + ball.xcor()) / 2
+
+
+    ycor_old = (ycor_old + ball.ycor()) / 2
+
+
+
+#ball old collision check
+    if (xcor_old > 340 and xcor_old < 350) and (ycor_old < paddle_2.ycor() + collision_radius and ycor_old > paddle_2.ycor() - collision_radius):
+        ball.setx(340)
+        ball.dx *= -1
+    if (xcor_old > -350 and xcor_old < -340) and (ycor_old < paddle_1.ycor() + collision_radius and ycor_old > paddle_1.ycor() - collision_radius):
+        ball.setx(-340)
+        ball.dx *= -1
+#current ball collision check
     if (ball.xcor() > 340 and ball.xcor() < 350) and (ball.ycor() < paddle_2.ycor() + collision_radius and ball.ycor() > paddle_2.ycor() - collision_radius):
         ball.setx(340)
         ball.dx *= -1
+
     if (ball.xcor() > -350 and ball.xcor() < -340) and (ball.ycor() < paddle_1.ycor() + collision_radius and ball.ycor() > paddle_1.ycor() - collision_radius):
         ball.setx(-340)
         ball.dx *= -1
+    
+    xcor_old = ball.xcor()
+    ycor_old = ball.ycor()
+
+
 
     wn.ontimer(game_loop, delay)
 game_loop()
